@@ -189,31 +189,36 @@ class CreateView(ui.View):
         row = 4,
     )
     async def on_submit(self, interaction, button):
-        if self.start is None or duration is None:
+        if self.start is None or self.duration is None:
             await interaction.response.send_message(
                 "L'horaire du cours n'est pas renseignée !",
                 ephemeral = True
             )
-        elif self.mode is None or self.topic is None:
+            return
+        if self.mode is None or self.topic is None:
             await interaction.response.send_message(
                 "Le sujet du cours n'est pas renseigné !",
                 ephemeral = True
             )
-        elif self.semester is None:
+            return
+        if self.semester is None:
             await interaction.response.send_message(
                 "Le semestre n'est pas renseigné !",
                 ephemeral = True
             )
-        elif self.subject is None:
+            return
+        if self.subject is None:
             await interaction.response.send_message(
                 "La matière n'est pas renseignée !",
                 ephemeral = True
             )
-        elif self.teachers is None:
+            return
+        if self.teachers is None:
             await interaction.response.send_message(
                 "Les professeurs ne sont pas renseignés !",
                 ephemeral = True
             )
+            return
 
         # TODO
         await interaction.response.defer()
