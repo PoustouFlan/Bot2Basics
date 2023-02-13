@@ -18,12 +18,16 @@ bot = commands.Bot(
 )
 
 initial_extensions = [
+    "cogs.create",
 ]
 
 @bot.event
 async def on_ready():
     log.info(f"Connecté en tant que {bot.user}")
 
+@bot.event
+async def on_error(event, *args, **kwargs):
+  log.exception(f"{event} a échoué.")
 
 async def load():
     for extension in initial_extensions:

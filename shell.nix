@@ -1,7 +1,12 @@
 { pkgs ? import <nixpkgs> { } }:
+let
+  unstable = import <nixos-unstable> {
+    config = {allowUnfree = true; };
+  };
+in
 pkgs.mkShell {
   buildInputs = [
-    pkgs.python310Packages.discordpy
+    unstable.python310Packages.discordpy
     pkgs.python310Packages.pyyaml
   ];
 }
