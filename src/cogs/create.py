@@ -6,9 +6,11 @@ from discord.ext import commands
 from discord import app_commands
 from bot_utils import guild_object
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import locale
 locale.setlocale(locale.LC_ALL, "fr_FR")
+
+from data.models import *
 
 import logging
 log = logging.getLogger("Bot2Basics")
@@ -69,10 +71,9 @@ class CreateSubjectModal(ui.Modal, title = "Sujet du cours"):
 
 
 class CreateView(ui.View):
-
     start:    Optional[datetime]             = None
-    duration: Optional[timedelta]            = None
-    semester: Optional[str]                  = None
+    duration: Optional[int]                  = None
+    semester: Optional[int]                  = None
     subject:  Optional[str]                  = None
     topic:    Optional[str]                  = None
     mode:     Optional[str]                  = None
@@ -103,7 +104,7 @@ class CreateView(ui.View):
         else:
             hours, minutes = map(int, modal.duration.value.split('h'))
 
-        duration = timedelta(hours = hours, minutes = minutes)
+        duration = hours * 60 + minutes
 
         self.start = start
         self.duration = duration
@@ -151,7 +152,7 @@ class CreateView(ui.View):
         row = 1,
     )
     async def select_semester(self, interaction, select):
-        self.semester = select.values[0]
+        self.semester = int(select.values[0][-1])
         await interaction.response.defer()
 
     @ui.select(
@@ -219,6 +220,28 @@ class CreateView(ui.View):
                 ephemeral = True
             )
             return
+
+        teachers = []
+        for member in self.teachers:
+            student = await Student.get_student(member)
+            if student is None:
+                await interaction.response.send_message(
+                    f"{member.mention} n'est pas enregistré !"
+                )
+                return
+            teachers.append(student)
+
+        course = Course(
+            start = self.start,
+            duration = self.duration,
+            semester = self.semester,
+            subject = self.subject,
+            topic = self.topic,
+            mode = self.mode,
+        )
+
+        await course.save()
+        await course.teachers.add(*teachers)
 
         # TODO
         await interaction.response.defer()

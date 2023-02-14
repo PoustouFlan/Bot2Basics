@@ -9,6 +9,8 @@ log.setLevel(logging.DEBUG)
 stream = logging.StreamHandler()
 log.addHandler(stream)
 
+from data.db_init import init
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(
@@ -19,6 +21,7 @@ bot = commands.Bot(
 
 initial_extensions = [
     "cogs.create",
+    "cogs.login",
 ]
 
 @bot.event
@@ -40,6 +43,7 @@ async def load():
 
 
 async def main():
+    await init()
     await load()
 
     await bot.start(TOKEN)
